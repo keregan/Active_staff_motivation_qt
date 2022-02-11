@@ -11,13 +11,20 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication
 
-Form, Window = uic.loadUiType("ui.ui")
+Form, Window = uic.loadUiType("untitled.ui")
 
 app = QApplication([])
 window = Window()
 form = Form()
 form.setupUi(window)
 window.show()
-app.exec()
 
+
+def on_c():
+    print("1")
+
+
+form.registration_window.clicked.connect(on_c)
+
+app.exec()
 
