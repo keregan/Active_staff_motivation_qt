@@ -1,12 +1,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
-import sys
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setEnabled(False)
+        MainWindow.setEnabled(True)
         MainWindow.resize(801, 500)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -75,15 +73,6 @@ class Ui_MainWindow(object):
         self.label_8.setText(_translate("MainWindow", "Заработок$$"))
         self.weekend.setText(_translate("MainWindow", "0"))
         self.label_10.setText(_translate("MainWindow", "Повышение"))
-
-    def add_function(self):
-        self.registration_window.click.connect(self.reg_window)
-
-    def reg_window(self):
-        r_window = QMessageBox()
-        r_window.setWindowTitle("Вход в систему")
-        r_window.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        r_window.exec_()
 
 
 if __name__ == "__main__":
