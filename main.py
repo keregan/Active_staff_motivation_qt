@@ -51,6 +51,24 @@ def check_button():
         print("Запись уже есть")
 
 
+# personal_login = input()
+# personal_password = input()
+#
+#
+# class Worker:
+#     def __init__(self, person_login, person_password):
+#         self.first_name = "Alex"
+#         self.second_name = "Alexey"
+#         self.role = "Admin"
+#         self.award = 5
+#         self.salary = 100
+#         self.additional_leave = 0
+#         self.promotion = 0
+#
+#
+# print(Worker(personal_login, personal_password).first_name)
+
+
 form.registration_window.clicked.connect(on_c)
 
 app.exec()
