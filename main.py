@@ -17,6 +17,8 @@ from PyQt5.QtWidgets import QApplication
 
 
 Form, Window = uic.loadUiType("untitled.ui")
+Form2, Window2 = uic.loadUiType("untitled_new_task.ui")
+Form3, Window3 = uic.loadUiType("untitled_reg.ui")
 
 app = QApplication([])
 window = Window()
@@ -24,16 +26,31 @@ form = Form()
 form.setupUi(window)
 window.show()
 
-global db
-global sql
+app2 = QApplication([])
+window2 = Window2()
+form2 = Form2()
+form2.setupUi(window2)
 
-db = sqlite3.connect('person.db')
-sql = db.cursor()
+app3 = QApplication([])
+window3 = Window3()
+form3 = Form3()
+form3.setupUi(window3)
+
+# global db
+# global sql
+#
+# db = sqlite3.connect('person.db')
+# sql = db.cursor()
 
 
-def on_c():
-    print("1")
+def new_task_open():
+    print("666")
+    form.money.setText("5")
+    window2.show()
 
+
+def reg_open():
+    window3.show()
 
 # def check_button():
 #     sql.execute("""CREATE TABLE IF NOT EXISTS persons (
@@ -51,9 +68,10 @@ def on_c():
 #         print("Запись уже есть")
 
 
+form.registration_window.clicked.connect(reg_open)
+form.pushButton.clicked.connect(new_task_open)
 
 
-form.registration_window.clicked.connect(on_c)
 
 app.exec()
 
