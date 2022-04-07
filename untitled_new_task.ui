@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>569</width>
-    <height>321</height>
+    <height>320</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,7 +42,7 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>180</x>
      <y>20</y>
      <width>101</width>
      <height>16</height>
@@ -55,8 +55,8 @@
   <widget class="QDateEdit" name="dateEdit">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>140</y>
+     <x>390</x>
+     <y>190</y>
      <width>110</width>
      <height>22</height>
     </rect>
@@ -65,14 +65,14 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>120</y>
+     <x>400</x>
+     <y>170</y>
      <width>91</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Срок выполнения</string>
+    <string>Срок выполнения до</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">
@@ -88,40 +88,50 @@
     <string>Создать</string>
    </property>
   </widget>
-  <widget class="QTextBrowser" name="textBrowser">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>40</y>
-     <width>121</width>
-     <height>31</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QComboBox" name="comboBox">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>170</x>
      <y>40</y>
      <width>111</width>
      <height>21</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QComboBox" name="comboBox_2">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>40</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
+   <item>
+    <property name="text">
+     <string>Очень срочная</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Срочная</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Средняя срочность</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Обычная</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Не срочная</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Не обязательная</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>350</x>
      <y>20</y>
      <width>81</width>
      <height>16</height>
@@ -131,14 +141,60 @@
     <string>Группа задачи</string>
    </property>
   </widget>
-  <widget class="QTextBrowser" name="textBrowser_2">
+  <widget class="QLineEdit" name="lineEdit">
    <property name="geometry">
     <rect>
      <x>30</x>
+     <y>40</y>
+     <width>113</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
      <y>110</y>
-     <width>291</width>
+     <width>271</width>
      <height>141</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_2">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>40</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>20</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Баллы</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>40</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>10</number>
    </property>
   </widget>
  </widget>

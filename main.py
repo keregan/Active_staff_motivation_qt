@@ -20,21 +20,21 @@ Form, Window = uic.loadUiType("untitled.ui")
 Form2, Window2 = uic.loadUiType("untitled_new_task.ui")
 Form3, Window3 = uic.loadUiType("untitled_reg.ui")
 
-app = QApplication([])
-window = Window()
-form = Form()
-form.setupUi(window)
-window.show()
+app_main = QApplication([])
+window_main = Window()
+form_main = Form()
+form_main.setupUi(window_main)
+window_main.show()
 
-app2 = QApplication([])
-window2 = Window2()
-form2 = Form2()
-form2.setupUi(window2)
+app_new_task = QApplication([])
+window_new_task = Window2()
+form_new_task = Form2()
+form_new_task.setupUi(window_new_task)
 
-app3 = QApplication([])
-window3 = Window3()
-form3 = Form3()
-form3.setupUi(window3)
+app_reg = QApplication([])
+window_reg = Window3()
+form_reg = Form3()
+form_reg.setupUi(window_reg)
 
 # global db
 # global sql
@@ -43,14 +43,23 @@ form3.setupUi(window3)
 # sql = db.cursor()
 
 
+# def pre_start():
+#     one = form_main.label_31.text()
+#     print(one)
+#     ball = 11 + int(one)
+#     print(ball)
+#     form_main.ball.Text(ball)
+#     print("1qq")
+До делай - ошибка
+
 def new_task_open():
-    print("666")
-    form.money.setText("5")
-    window2.show()
+    # print("66")
+    # form.money.setText("5")
+    window_new_task.show()
 
 
 def reg_open():
-    window3.show()
+    window_reg.show()
 
 # def check_button():
 #     sql.execute("""CREATE TABLE IF NOT EXISTS persons (
@@ -68,10 +77,35 @@ def reg_open():
 #         print("Запись уже есть")
 
 
-form.registration_window.clicked.connect(reg_open)
-form.pushButton.clicked.connect(new_task_open)
+# def new_task_close():
+#     app2.exec()
 
 
+def reg_close():
+    app_reg.closeAllWindows()
 
-app.exec()
+
+def create_new_task():
+    line = form_new_task.lineEdit.text()
+    form_main.lineEdit.setText(line)
+    form_new_task.lineEdit.setText("")
+
+    status = form_new_task.comboBox.currentText()
+    form_main.label_6.setText(status)
+
+    descr = form_new_task.textEdit.toPlainText()
+    form_main.textEdit.setPlainText(descr)
+    form_new_task.textEdit.setPlainText("")
+
+    ball_one = form_new_task.spinBox.text()
+    form_main.label_31.setText(ball_one)
+
+
+# form_main.registration_window.clicked.connect(reg_open)
+form_main.registration_window.clicked.connect(pre_start)
+form_main.pushButton.clicked.connect(new_task_open)
+form_new_task.pushButton.clicked.connect(create_new_task)
+form_reg.pushButton.clicked.connect(reg_close)
+
+app_main.exec()
 
