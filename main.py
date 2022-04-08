@@ -7,14 +7,14 @@
 # ui.setupUi(MainWindow)
 # MainWindow.show()
 # sys.exit(app.exec_())
-
+import datetime
+import time
 import sqlite3
 import tkinter
 from tkinter import *
 from PIL import Image
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication
-
 
 Form, Window = uic.loadUiType("untitled.ui")
 Form2, Window2 = uic.loadUiType("untitled_new_task.ui")
@@ -38,7 +38,7 @@ form_reg.setupUi(window_reg)
 
 # global db
 # global sql
-#
+
 # db = sqlite3.connect('person.db')
 # sql = db.cursor()
 
@@ -48,14 +48,21 @@ form_reg.setupUi(window_reg)
 #     print(one)
 #     ball = 11 + int(one)
 #     print(ball)
-#     form_main.ball.Text(ball)
+#     form_main.user_data.setText(ball)
 #     print("1qq")
-До делай - ошибка
+
+def starter():
+    to_day = datetime.date.today()
+    form_main.dateEdit.setMinimumDate(to_day)
+
 
 def new_task_open():
     # print("66")
     # form.money.setText("5")
     window_new_task.show()
+
+    to_day = datetime.date.today()
+    form_new_task.dateEdit.setMinimumDate(to_day)
 
 
 def reg_open():
@@ -100,9 +107,25 @@ def create_new_task():
     ball_one = form_new_task.spinBox.text()
     form_main.label_31.setText(ball_one)
 
+    grt = form_new_task.lineEdit_2.text()
+    form_main.label_17.setText(grt)
 
-# form_main.registration_window.clicked.connect(reg_open)
-form_main.registration_window.clicked.connect(pre_start)
+    data_task = form_new_task.dateEdit.date()
+    to_day = form_main.dateEdit.date()
+    pas_day = to_day.daysTo(data_task)
+    form_main.TextLabel.setText(str(pas_day))
+
+    test = form_main.calendarWidget.selectedDate().addDays(+pas_day)
+    print(test)
+
+    # tt = too_day - data_task
+    # print(too_day)
+    # past_day = data_task - to_day
+    # print(past_day)
+
+
+form_main.pushButton_2.clicked.connect(starter)
+form_main.registration_window.clicked.connect(reg_open)
 form_main.pushButton.clicked.connect(new_task_open)
 form_new_task.pushButton.clicked.connect(create_new_task)
 form_reg.pushButton.clicked.connect(reg_close)
