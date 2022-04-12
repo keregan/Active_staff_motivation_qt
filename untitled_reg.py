@@ -11,42 +11,60 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(433, 132)
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(70, 30, 47, 16))
+class Ui_Win_reg(object):
+    def setupUi(self, Win_reg):
+        Win_reg.setObjectName("Win_reg")
+        Win_reg.resize(208, 113)
+        Win_reg.setMinimumSize(QtCore.QSize(208, 113))
+        Win_reg.setMaximumSize(QtCore.QSize(208, 113))
+        self.layoutWidget = QtWidgets.QWidget(Win_reg)
+        self.layoutWidget.setGeometry(QtCore.QRect(20, 10, 178, 48))
+        self.layoutWidget.setObjectName("layoutWidget")
+        self.formLayout = QtWidgets.QFormLayout(self.layoutWidget)
+        self.formLayout.setContentsMargins(0, 0, 0, 0)
+        self.formLayout.setObjectName("formLayout")
+        self.label = QtWidgets.QLabel(self.layoutWidget)
         self.label.setObjectName("label")
-        self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(70, 70, 47, 13))
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label)
+        self.user_login = QtWidgets.QLineEdit(self.layoutWidget)
+        self.user_login.setObjectName("user_login")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.user_login)
+        self.label_2 = QtWidgets.QLabel(self.layoutWidget)
         self.label_2.setObjectName("label_2")
-        self.textBrowser = QtWidgets.QTextBrowser(Dialog)
-        self.textBrowser.setGeometry(QtCore.QRect(130, 20, 256, 31))
-        self.textBrowser.setObjectName("textBrowser")
-        self.textBrowser_2 = QtWidgets.QTextBrowser(Dialog)
-        self.textBrowser_2.setGeometry(QtCore.QRect(130, 60, 256, 31))
-        self.textBrowser_2.setObjectName("textBrowser_2")
-        self.pushButton = QtWidgets.QPushButton(Dialog)
-        self.pushButton.setGeometry(QtCore.QRect(170, 100, 75, 23))
-        self.pushButton.setObjectName("pushButton")
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_2)
+        self.user_password = QtWidgets.QLineEdit(self.layoutWidget)
+        self.user_password.setObjectName("user_password")
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.user_password)
+        self.response_to_user = QtWidgets.QLabel(Win_reg)
+        self.response_to_user.setGeometry(QtCore.QRect(70, 60, 81, 20))
+        self.response_to_user.setObjectName("response_to_user")
+        self.splitter = QtWidgets.QSplitter(Win_reg)
+        self.splitter.setGeometry(QtCore.QRect(30, 80, 150, 23))
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setObjectName("splitter")
+        self.login_button = QtWidgets.QPushButton(self.splitter)
+        self.login_button.setObjectName("login_button")
+        self.register_button = QtWidgets.QPushButton(self.splitter)
+        self.register_button.setObjectName("register_button")
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(Win_reg)
+        QtCore.QMetaObject.connectSlotsByName(Win_reg)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self, Win_reg):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.label.setText(_translate("Dialog", "Логин"))
-        self.label_2.setText(_translate("Dialog", "Пароль"))
-        self.pushButton.setText(_translate("Dialog", "Войти"))
+        Win_reg.setWindowTitle(_translate("Win_reg", "Вход"))
+        self.label.setText(_translate("Win_reg", "Логин"))
+        self.label_2.setText(_translate("Win_reg", "Пароль"))
+        self.response_to_user.setText(_translate("Win_reg", "Вход в систему"))
+        self.login_button.setText(_translate("Win_reg", "Войти"))
+        self.register_button.setText(_translate("Win_reg", "Регистрация"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    Win_reg = QtWidgets.QWidget()
+    ui = Ui_Win_reg()
+    ui.setupUi(Win_reg)
+    Win_reg.show()
     sys.exit(app.exec_())

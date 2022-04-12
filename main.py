@@ -16,25 +16,34 @@ from PIL import Image
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication
 
-Form, Window = uic.loadUiType("untitled.ui")
-Form2, Window2 = uic.loadUiType("untitled_new_task.ui")
-Form3, Window3 = uic.loadUiType("untitled_reg.ui")
+Form_main, Window_main = uic.loadUiType("untitled.ui")
+Form_new_task, Window_new_task = uic.loadUiType("untitled_new_task.ui")
+Form_reg, Window_reg = uic.loadUiType("untitled_reg.ui")
+Form_reg_one, Window_reg_one = uic.loadUiType("untitled_reg_one.ui")
 
 app_main = QApplication([])
-window_main = Window()
-form_main = Form()
+window_main = Window_main()
+form_main = Form_main()
 form_main.setupUi(window_main)
 window_main.show()
 
 app_new_task = QApplication([])
-window_new_task = Window2()
-form_new_task = Form2()
+window_new_task = Window_new_task()
+form_new_task = Form_new_task()
 form_new_task.setupUi(window_new_task)
+# window_new_task.show()
 
 app_reg = QApplication([])
-window_reg = Window3()
-form_reg = Form3()
+window_reg = Window_reg()
+form_reg = Form_reg()
 form_reg.setupUi(window_reg)
+# window_reg.show()
+
+app_reg_one = QApplication([])
+window_reg_one = Window_reg_one()
+form_reg_one = Form_reg_one()
+form_reg_one.setupUi(window_reg_one)
+# window_reg_one.show()
 
 # global db
 # global sql
@@ -42,14 +51,6 @@ form_reg.setupUi(window_reg)
 # db = sqlite3.connect('person.db')
 # sql = db.cursor()
 
-
-# def pre_start():
-#     one = form_main.label_31.text()
-#     print(one)
-#     ball = 11 + int(one)
-#     print(ball)
-#     form_main.user_data.setText(ball)
-#     print("1qq")
 
 def starter():
     to_day = datetime.date.today()
@@ -88,10 +89,6 @@ def reg_open():
 #     app2.exec()
 
 
-def reg_close():
-    app_reg.closeAllWindows()
-
-
 def create_new_task():
     line = form_new_task.lineEdit.text()
     form_main.lineEdit.setText(line)
@@ -118,17 +115,28 @@ def create_new_task():
     test = form_main.calendarWidget.selectedDate().addDays(+pas_day)
     print(test)
 
-    # tt = too_day - data_task
-    # print(too_day)
-    # past_day = data_task - to_day
-    # print(past_day)
+
+def reg_one_open():
+    window_reg_one.show()
+
+
+def reg_close():
+
+    window_reg.close()
+
+
+def reg_one_close():
+
+    app_reg_one.closeAllWindows()
 
 
 form_main.pushButton_2.clicked.connect(starter)
 form_main.registration_window.clicked.connect(reg_open)
 form_main.pushButton.clicked.connect(new_task_open)
 form_new_task.pushButton.clicked.connect(create_new_task)
-form_reg.pushButton.clicked.connect(reg_close)
+form_reg.register_button.clicked.connect(reg_one_open)
+form_reg.login_button.clicked.connect(reg_close)
+form_reg_one.login_button.clicked.connect(reg_one_close)
 
 app_main.exec()
 
