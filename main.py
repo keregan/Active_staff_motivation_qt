@@ -67,9 +67,40 @@ with sqlite3.connect("User_db.db") as user_db:
     )""")
 
 
+def main_form(user_login):
+    try:
+        user_db_main = sqlite3.connect("User_db.db")
+        cursor_db_main = user_db_main.cursor()
+
+        cursor_db_main.execute("SELECT first_name FROM users WHERE user_login = ?", [user_login])
+        user_db_main.commit()
+        c_log1 = cursor_db_main.fetchone()
+        cursor_db_main.execute("SELECT second_name FROM users WHERE user_login = ?", [user_login])
+        user_db_main.commit()
+        c_log2 = cursor_db_main.fetchone()
+        cursor_db_main.execute("SELECT patronymic FROM users WHERE user_login = ?", [user_login])
+        user_db_main.commit()
+        c_log3 = cursor_db_main.fetchone()
+        cursor_db_main.execute("SELECT position FROM users WHERE user_login = ?", [user_login])
+        user_db_main.commit()
+        c_log4 = cursor_db_main.fetchone()
+        cursor_db_main.execute("SELECT ball FROM users WHERE user_login = ?", [user_login])
+        user_db_main.commit()
+        c_log5 = cursor_db_main.fetchone()
+        form_main.user_data.setText(str(c_log1[0]) + " " + str(c_log2[0]) + " " + str(c_log3[0]))
+        form_main.position.setText(str(c_log4[0]))
+        form_main.ball.setText(str(c_log5[0]))
+    except sqlite3.Error as err:
+        form_main.user_data.setText(err)
+    finally:
+        cursor_db_main.close()
+        user_db_main.close()
+
+
 def starter():
     to_day = datetime.date.today()
     form_main.dateEdit.setMinimumDate(to_day)
+    main_form("Alex_1")
 
 
 def new_task_open():
@@ -79,10 +110,6 @@ def new_task_open():
 
     to_day = datetime.date.today()
     form_new_task.dateEdit.setMinimumDate(to_day)
-
-
-def reg_open():
-    window_reg.show()
 
 
 def create_new_task():
@@ -112,12 +139,15 @@ def create_new_task():
     # print(test)
 
 
+def reg_open():
+    window_reg.show()
+
+
 def reg_one_open():
     window_reg_one.show()
 
 
 def reg_close():
-
     user_login = form_reg.user_login.text()
     user_password = form_reg.user_password.text()
 
@@ -143,6 +173,7 @@ def reg_close():
                 if c_pas is None:
                     form_reg.response_to_user.setText("Пароль не верный")
                 else:
+                    # main_form(user_login)
                     user_login = form_reg.user_login.setText("")
                     user_password = form_reg.user_password.setText("")
                     window_reg.close()
@@ -226,10 +257,10 @@ def reg_one_close():
 #         user_db_login.close()
 
 
-# form_main.pushButton_2.clicked.connect(starter)
+form_main.pushButton_2.clicked.connect(starter)
 form_main.registration_window.clicked.connect(reg_open)
-# form_main.pushButton.clicked.connect(new_task_open)
-# form_new_task.pushButton.clicked.connect(create_new_task)
+form_main.pushButton.clicked.connect(new_task_open)
+form_new_task.pushButton.clicked.connect(create_new_task)
 form_reg.register_button.clicked.connect(reg_one_open)
 form_reg.login_button.clicked.connect(reg_close)
 form_reg_one.login_button.clicked.connect(reg_one_close)
