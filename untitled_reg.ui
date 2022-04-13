@@ -60,11 +60,14 @@
   <widget class="QLabel" name="response_to_user">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>20</x>
      <y>60</y>
-     <width>81</width>
+     <width>171</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
    </property>
    <property name="text">
     <string>Вход в систему</string>

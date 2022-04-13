@@ -108,8 +108,8 @@ def create_new_task():
     pas_day = to_day.daysTo(data_task)
     form_main.TextLabel.setText(str(pas_day))
 
-    test = form_main.calendarWidget.selectedDate().addDays(+pas_day)
-    print(test)
+    # test = form_main.calendarWidget.selectedDate().addDays(+pas_day)
+    # print(test)
 
 
 def reg_one_open():
@@ -118,7 +118,39 @@ def reg_one_open():
 
 def reg_close():
 
-    window_reg.close()
+    user_login = form_reg.user_login.text()
+    user_password = form_reg.user_password.text()
+
+    if not user_login or not user_password:
+        form_reg.response_to_user.setText("Заполните все поля")
+    else:
+        try:
+            user_db_login = sqlite3.connect("User_db.db")
+            cursor_db_login = user_db_login.cursor()
+
+            user_db_login.create_function("md5", 1, call_number)
+
+            cursor_db_login.execute("SELECT user_login FROM users WHERE user_login = ?", [user_login])
+            user_db_login.commit()
+            c_log = cursor_db_login.fetchone()
+            if c_log is None:
+                form_reg.response_to_user.setText("Такого логина нету, зарегистрируйтесь")
+            else:
+                cursor_db_login.execute("SELECT user_password FROM users WHERE user_login = ? "
+                                        "AND user_password = md5(?)", [user_login, user_password])
+                user_db_login.commit()
+                c_pas = cursor_db_login.fetchone()
+                if c_pas is None:
+                    form_reg.response_to_user.setText("Пароль не верный")
+                else:
+                    user_login = form_reg.user_login.setText("")
+                    user_password = form_reg.user_password.setText("")
+                    window_reg.close()
+        except sqlite3.Error as err:
+            form_reg.response_to_user.setText(err)
+        finally:
+            cursor_db_login.close()
+            user_db_login.close()
 
 
 def reg_one_close():
@@ -130,63 +162,68 @@ def reg_one_close():
     position = form_reg_one.position.text()
 
     if not user_login or not user_password or not first_name or not second_name or not patronymic or not position:
-        form_reg_one.Error.setText("Заполните все поля")
+        if not user_login:
+            form_reg_one.Error.setText("Введите новый логин")
+        else:
+            form_reg_one.Error.setText("Заполните все поля")
     else:
         try:
             user_db_reg = sqlite3.connect("User_db.db")
             cursor_db_reg = user_db_reg.cursor()
 
-            user_db_reg.create_function("md5", 1, call_number)
-            u_db = [user_login, user_password, first_name, second_name, patronymic, position]
-            cursor_db_reg.execute("INSERT INTO users(user_login, user_password, first_name, second_name, patronymic, position) VALUES(?, md5(?), ?, ?, ?, ?)", u_db)
+            cursor_db_reg.execute("SELECT user_login FROM users WHERE user_login = ?", [user_login])
             user_db_reg.commit()
+            c_log = cursor_db_reg.fetchone()
+            if c_log is None:
+                user_db_reg.create_function("md5", 1, call_number)
+                u_db = [user_login, user_password, first_name, second_name, patronymic, position]
+                cursor_db_reg.execute("INSERT INTO users(user_login, user_password, first_name, second_name, "
+                                      "patronymic, position) VALUES(?, md5(?), ?, ?, ?, ?)", u_db)
+                user_db_reg.commit()
 
-            form_reg_one.user_login.setText("")
-            form_reg_one.user_password.setText("")
-            form_reg_one.first_name.setText("")
-            form_reg_one.second_name.setText("")
-            form_reg_one.patronymic.setText("")
-            form_reg_one.position.setText("")
+                form_reg_one.user_login.setText("")
+                form_reg_one.user_password.setText("")
+                form_reg_one.first_name.setText("")
+                form_reg_one.second_name.setText("")
+                form_reg_one.patronymic.setText("")
+                form_reg_one.position.setText("")
+                app_reg_one.closeAllWindows()
+            else:
+                form_reg_one.user_login.setText("")
+                reg_one_close()
+
         except sqlite3.Error as err:
             form_reg_one.Error.setText(err)
         finally:
             cursor_db_reg.close()
             user_db_reg.close()
 
-            # cursor_db_reg.execute("SELECT user_login FROM users WHERE user_login = ?", [user_login])
-            # if cursor_db_reg.fetchone() is NONE:
-            #     u_db = [user_login, user_password, first_name, second_name, patronymic, position]
-            #     cursor_db_reg.execute("INSERT INTO users(user_login, user_password, first_name, second_name, patronymic, position) VALUES(?, md5(?), ?, ?, ?, ?)", u_db)
-            #     user_db.commit()
-            # else:
-            #     print("Такого логина не существует")
-        app_reg_one.closeAllWindows()
 
-
-def log_in():
-    user_login = 1
-    user_password = 1
-
-    try:
-        user_db_login = sqlite3.connect("User_db.db")
-        cursor_db_login = user_db_login.cursor()
-
-        user_db_login.create_function("md5", 1, call_number)
-
-        cursor_db_login.execute("SELECT login FROM users WHERE login = ?", [user_login])
-        if cursor_db_login.fetchone() is NONE:
-            print("такого логина нету")
-        else:
-            cursor_db_login.execute("SELECT password FROM users WHERE login = ? AND password = md5(?)", [user_login, user_password])
-            if cursor_db_login.fetchone() is NONE:
-                print("Пароль не верный")
-            else:
-                print("Пароль верный")
-    except sqlite3.Error as e:
-        print("Error", e)
-    finally:
-        cursor_db_login.close()
-        user_db_login.close()
+# def log_in():
+#     user_login = 1
+#     user_password = 1
+#
+#     try:
+#         user_db_login = sqlite3.connect("User_db.db")
+#         cursor_db_login = user_db_login.cursor()
+#
+#         user_db_login.create_function("md5", 1, call_number)
+#
+#         cursor_db_login.execute("SELECT login FROM users WHERE login = ?", [user_login])
+#         if cursor_db_login.fetchone() is NONE:
+#             print("такого логина нету")
+#         else:
+#             cursor_db_login.execute("SELECT password FROM users WHERE login = ? AND"
+#                                     " password = md5(?)", [user_login, user_password])
+#             if cursor_db_login.fetchone() is NONE:
+#                 print("Пароль не верный")
+#             else:
+#                 print("Пароль верный")
+#     except sqlite3.Error as e:
+#         print("Error", e)
+#     finally:
+#         cursor_db_login.close()
+#         user_db_login.close()
 
 
 # form_main.pushButton_2.clicked.connect(starter)
