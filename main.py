@@ -140,6 +140,21 @@ def restarter():
             ball_one = cursor_db_task.fetchone()
             form_main.ball_1.setText(str(ball_one[0]))
 
+            cursor_db_task.execute("SELECT lead_time_one FROM tasks WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            datetime.lead_time = cursor_db_task.fetchone()
+            lead_time_0 = datetime.lead_time[0]
+            # lead_time_1 = datetime.strptime(lead_time_0, '%Y-%m-%d')
+            to_day = datetime.date.today()
+            # pas = to_day.DaysTo(lead_time_1)
+            # datetime.timedelta()
+            # datetime.pas = to_day.daysTo(datetime.lead_time_1)
+            print(lead_time_0, " ", to_day)
+            # lead_time_one = form_new_task.lead_time.date()
+            # lead_time_one_con = lead_time_one.toPyDate()
+            # data_task = form_new_task.dateEdit.date()
+            # to_day = form_main.dateEdit.date()
+            # pas_day = to_day.daysTo(data_task)
     except sqlite3.Error as err:
         form_new_task.error_new_task.setText(err)
     finally:
