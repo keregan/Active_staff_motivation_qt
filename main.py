@@ -27,13 +27,13 @@ app_main = QApplication([])
 window_main = Window_main()
 form_main = Form_main()
 form_main.setupUi(window_main)
-# window_main.show()
+window_main.show()
 
 app_new_task = QApplication([])
 window_new_task = Window_new_task()
 form_new_task = Form_new_task()
 form_new_task.setupUi(window_new_task)
-window_new_task.show()
+# window_new_task.show()
 
 app_reg = QApplication([])
 window_reg = Window_reg()
@@ -109,7 +109,43 @@ def main_form(user_login):
         user_db_main.close()
 
 
-def starter():
+def restarter():
+    user_login = "Alex_1"
+
+    try:
+        user_db_task = sqlite3.connect("User_db.db")
+        cursor_db_task = user_db_task.cursor()
+
+        cursor_db_task.execute("SELECT user_login FROM tasks WHERE user_login = ?", [user_login])
+        user_db_task.commit()
+        none_login_task = cursor_db_task.fetchone()
+
+        if none_login_task is None:
+            form_main.user_data.setText("Войдите в аккаунт")
+        else:
+            cursor_db_task.execute("SELECT name_task_one FROM tasks WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            name_task = cursor_db_task.fetchone()
+            form_main.name_task_1.setText(str(name_task[0]))
+            cursor_db_task.execute("SELECT status_task_one FROM tasks WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            name_status = cursor_db_task.fetchone()
+            form_main.name_status_1.setText(str(name_status[0]))
+            cursor_db_task.execute("SELECT group_task_one FROM tasks WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            name_group = cursor_db_task.fetchone()
+            form_main.name_group_1.setText(str(name_group[0]))
+            cursor_db_task.execute("SELECT ball_one FROM tasks WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            ball_one = cursor_db_task.fetchone()
+            form_main.ball_1.setText(str(ball_one[0]))
+
+    except sqlite3.Error as err:
+        form_new_task.error_new_task.setText(err)
+    finally:
+        cursor_db_task.close()
+        user_db_task.close()
+
     # to_day = datetime.date.today()
     # form_main.dateEdit.setMinimumDate(to_day)
     main_form("Alex_1")
@@ -137,6 +173,7 @@ def create_new_task(user_login):
     ball_one = form_new_task.ball.text()
     group_task_one = form_new_task.group_task.text()
     lead_time_one = form_new_task.lead_time.date()
+    lead_time_one_con = lead_time_one.toPyDate()
     user_login = "Alex_1"
 
     if not name_task_one or not status_task_one or not description_task_one or not ball_one or not group_task_one or not lead_time_one:
@@ -151,13 +188,12 @@ def create_new_task(user_login):
             none_name_task = cursor_db_task.fetchone()
 
             if none_name_task is None:
-                task_db = [user_login, name_task_one, status_task_one, description_task_one, ball_one, group_task_one]
+                task_db = [user_login, name_task_one, status_task_one, description_task_one, ball_one, group_task_one, lead_time_one_con]
                 cursor_db_task.execute("INSERT INTO tasks(user_login, name_task_one, status_task_one, description_task_one, "
-                                      "ball_one, group_task_one) VALUES(?, ?, ?, ?, ?, ?)", task_db)
+                                      "ball_one, group_task_one, lead_time_one ) VALUES(?, ?, ?, ?, ?, ?, ?)", task_db)
                 user_db_task.commit()
             else:
                 form_new_task.error_new_task.setText("Запись с таким названием уже имеется")
-                form_new_task.name_task.setText("")
         except sqlite3.Error as err:
             form_new_task.error_new_task.setText(err)
         finally:
@@ -264,9 +300,9 @@ def reg_one_close():
             user_db_reg.close()
 
 
-form_main.pushButton_2.clicked.connect(starter)
+form_main.restart.clicked.connect(restarter)
 form_main.registration_window.clicked.connect(reg_open)
-form_main.pushButton.clicked.connect(new_task_open)
+form_main.new_task_window.clicked.connect(new_task_open)
 form_new_task.create_new_task.clicked.connect(create_new_task)
 form_reg.register_button.clicked.connect(reg_one_open)
 form_reg.login_button.clicked.connect(reg_close)
