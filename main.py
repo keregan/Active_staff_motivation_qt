@@ -27,13 +27,13 @@ app_main = QApplication([])
 window_main = Window_main()
 form_main = Form_main()
 form_main.setupUi(window_main)
-window_main.show()
+# window_main.show()
 
 app_new_task = QApplication([])
 window_new_task = Window_new_task()
 form_new_task = Form_new_task()
 form_new_task.setupUi(window_new_task)
-# window_new_task.show()
+window_new_task.show()
 
 app_reg = QApplication([])
 window_reg = Window_reg()
@@ -74,7 +74,7 @@ with sqlite3.connect("User_db.db") as user_db:
         description_task_one VARCHAR(3000) NOT NULL,
         ball_one VARCHAR(30) NOT NULL,
         group_task_one VARCHAR(100) NOT NULL,
-        lead_time_one DATA NOT NULL
+        lead_time_one DATA
     )""")
 
 
@@ -123,6 +123,8 @@ def new_task_open():
         form_main.user_data.setText("Войдите в аккаунт")
     else:
         window_new_task.show()
+        form_new_task.error_new_task.setText("")
+        form_new_task.lead_time.setMinimumDate(datetime.date.today())
 
     # to_day = datetime.date.today()
     # form_new_task.lead_time.setMinimumDate(to_day)
@@ -135,29 +137,27 @@ def create_new_task(user_login):
     ball_one = form_new_task.ball.text()
     group_task_one = form_new_task.group_task.text()
     lead_time_one = form_new_task.lead_time.date()
+    user_login = "Alex_1"
 
     if not name_task_one or not status_task_one or not description_task_one or not ball_one or not group_task_one or not lead_time_one:
-        if not name_task_one:
-            form_new_task.error_new_task.setText("Проверьте название или замените его")
-        else:
-            form_new_task.error_new_task.setText("Проверьте заполненость всех полей")
+        form_new_task.error_new_task.setText("Проверьте заполненость всех полей")
     else:
         try:
             user_db_task = sqlite3.connect("User_db.db")
             cursor_db_task = user_db_task.cursor()
 
-            # cursor_db_task.execute("SELECT user_login FROM users WHERE user_login = ?", [user_login])
-            # user_db_task.commit()
-            #
-            # c_log = cursor_db_task.fetchone()
-            # if c_log is None:
-            #     task_db = []
-            #     cursor_db_task.execute("INSERT INTO users(user_login, user_password, first_name, second_name, "
-            #                           "patronymic, position) VALUES(?, ?, ?, ?, ?, ?)", task_db)
-            #     user_db_task.commit()
-            #
-            # else:
+            cursor_db_task.execute("SELECT user_login FROM tasks WHERE user_login = ? AND name_task_one = ?", [user_login, name_task_one])
+            user_db_task.commit()
+            none_name_task = cursor_db_task.fetchone()
 
+            if none_name_task is None:
+                task_db = [user_login, name_task_one, status_task_one, description_task_one, ball_one, group_task_one]
+                cursor_db_task.execute("INSERT INTO tasks(user_login, name_task_one, status_task_one, description_task_one, "
+                                      "ball_one, group_task_one) VALUES(?, ?, ?, ?, ?, ?)", task_db)
+                user_db_task.commit()
+            else:
+                form_new_task.error_new_task.setText("Запись с таким названием уже имеется")
+                form_new_task.name_task.setText("")
         except sqlite3.Error as err:
             form_new_task.error_new_task.setText(err)
         finally:
