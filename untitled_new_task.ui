@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>569</width>
-    <height>320</height>
+    <width>467</width>
+    <height>289</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>30</x>
      <y>20</y>
-     <width>47</width>
-     <height>13</height>
+     <width>101</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
@@ -29,8 +29,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>90</y>
+     <x>130</x>
+     <y>70</y>
      <width>91</width>
      <height>16</height>
     </rect>
@@ -42,7 +42,7 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>190</x>
      <y>20</y>
      <width>101</width>
      <height>16</height>
@@ -52,11 +52,11 @@
     <string>Статус задачи</string>
    </property>
   </widget>
-  <widget class="QDateEdit" name="dateEdit">
+  <widget class="QDateEdit" name="lead_time">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>190</y>
+     <x>330</x>
+     <y>200</y>
      <width>110</width>
      <height>22</height>
     </rect>
@@ -68,8 +68,8 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>170</y>
+     <x>340</x>
+     <y>180</y>
      <width>91</width>
      <height>16</height>
     </rect>
@@ -78,11 +78,11 @@
     <string>Срок выполнения до</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="create_new_task">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>260</y>
+     <x>40</x>
+     <y>240</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -91,13 +91,13 @@
     <string>Создать</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="status_task">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>180</x>
      <y>40</y>
-     <width>111</width>
-     <height>21</height>
+     <width>125</width>
+     <height>20</height>
     </rect>
    </property>
    <item>
@@ -134,7 +134,7 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>340</x>
      <y>20</y>
      <width>81</width>
      <height>16</height>
@@ -144,32 +144,32 @@
     <string>Группа задачи</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="name_task">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>40</y>
-     <width>113</width>
+     <width>128</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit">
+  <widget class="QTextEdit" name="description_task">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>110</y>
+     <x>40</x>
+     <y>90</y>
      <width>271</width>
      <height>141</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
+  <widget class="QLineEdit" name="group_task">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>320</x>
      <y>40</y>
-     <width>101</width>
+     <width>128</width>
      <height>20</height>
     </rect>
    </property>
@@ -177,8 +177,8 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>20</y>
+     <x>350</x>
+     <y>100</y>
      <width>81</width>
      <height>16</height>
     </rect>
@@ -187,17 +187,30 @@
     <string>Баллы</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="spinBox">
+  <widget class="QSpinBox" name="ball">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>40</y>
+     <x>350</x>
+     <y>120</y>
      <width>42</width>
      <height>22</height>
     </rect>
    </property>
    <property name="maximum">
     <number>10</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="error_new_task">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>250</y>
+     <width>231</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

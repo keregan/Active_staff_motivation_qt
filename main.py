@@ -66,12 +66,24 @@ with sqlite3.connect("User_db.db") as user_db:
         ball INTEGER NOT NULL DEFAULT 0
     )""")
 
+    cursor_db.executescript("""CREATE TABLE IF NOT EXISTS tasks(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_login VARCHAR(30) NOT NULL,
+        name_task_one VARCHAR(100) NOT NULL,
+        status_task_one VARCHAR(30) NOT NULL,
+        description_task_one VARCHAR(3000) NOT NULL,
+        ball_one VARCHAR(30) NOT NULL,
+        group_task_one VARCHAR(100) NOT NULL,
+        lead_time_one DATA NOT NULL
+    )""")
+
 
 def main_form(user_login):
     try:
         user_db_main = sqlite3.connect("User_db.db")
         cursor_db_main = user_db_main.cursor()
 
+        form_main.user_login.setText(user_login)
         cursor_db_main.execute("SELECT first_name FROM users WHERE user_login = ?", [user_login])
         user_db_main.commit()
         c_log1 = cursor_db_main.fetchone()
@@ -98,42 +110,64 @@ def main_form(user_login):
 
 
 def starter():
-    to_day = datetime.date.today()
-    form_main.dateEdit.setMinimumDate(to_day)
+    # to_day = datetime.date.today()
+    # form_main.dateEdit.setMinimumDate(to_day)
     main_form("Alex_1")
 
 
 def new_task_open():
-    # print("66")
-    # form.money.setText("5")
-    window_new_task.show()
+    user_login = form_main.user_login.text()
+    create_new_task(user_login)
 
-    to_day = datetime.date.today()
-    form_new_task.dateEdit.setMinimumDate(to_day)
+    if not user_login or user_login == "Войдите в аккаунт":
+        form_main.user_data.setText("Войдите в аккаунт")
+    else:
+        window_new_task.show()
+
+    # to_day = datetime.date.today()
+    # form_new_task.lead_time.setMinimumDate(to_day)
 
 
-def create_new_task():
-    line = form_new_task.lineEdit.text()
-    form_main.lineEdit.setText(line)
-    form_new_task.lineEdit.setText("")
+def create_new_task(user_login):
+    name_task_one = form_new_task.name_task.text()
+    status_task_one = form_new_task.status_task.currentText()
+    description_task_one = form_new_task.description_task.toPlainText()
+    ball_one = form_new_task.ball.text()
+    group_task_one = form_new_task.group_task.text()
+    lead_time_one = form_new_task.lead_time.date()
 
-    status = form_new_task.comboBox.currentText()
-    form_main.label_6.setText(status)
+    if not name_task_one or not status_task_one or not description_task_one or not ball_one or not group_task_one or not lead_time_one:
+        if not name_task_one:
+            form_new_task.error_new_task.setText("Проверьте название или замените его")
+        else:
+            form_new_task.error_new_task.setText("Проверьте заполненость всех полей")
+    else:
+        try:
+            user_db_task = sqlite3.connect("User_db.db")
+            cursor_db_task = user_db_task.cursor()
 
-    descr = form_new_task.textEdit.toPlainText()
-    form_main.textEdit.setPlainText(descr)
-    form_new_task.textEdit.setPlainText("")
+            # cursor_db_task.execute("SELECT user_login FROM users WHERE user_login = ?", [user_login])
+            # user_db_task.commit()
+            #
+            # c_log = cursor_db_task.fetchone()
+            # if c_log is None:
+            #     task_db = []
+            #     cursor_db_task.execute("INSERT INTO users(user_login, user_password, first_name, second_name, "
+            #                           "patronymic, position) VALUES(?, ?, ?, ?, ?, ?)", task_db)
+            #     user_db_task.commit()
+            #
+            # else:
 
-    ball_one = form_new_task.spinBox.text()
-    form_main.label_31.setText(ball_one)
+        except sqlite3.Error as err:
+            form_new_task.error_new_task.setText(err)
+        finally:
+            cursor_db_task.close()
+            user_db_task.close()
 
-    grt = form_new_task.lineEdit_2.text()
-    form_main.label_17.setText(grt)
-
-    data_task = form_new_task.dateEdit.date()
-    to_day = form_main.dateEdit.date()
-    pas_day = to_day.daysTo(data_task)
-    form_main.TextLabel.setText(str(pas_day))
+    # data_task = form_new_task.dateEdit.date()
+    # to_day = form_main.dateEdit.date()
+    # pas_day = to_day.daysTo(data_task)
+    # form_main.TextLabel.setText(str(pas_day))
 
     # test = form_main.calendarWidget.selectedDate().addDays(+pas_day)
     # print(test)
@@ -230,37 +264,10 @@ def reg_one_close():
             user_db_reg.close()
 
 
-# def log_in():
-#     user_login = 1
-#     user_password = 1
-#
-#     try:
-#         user_db_login = sqlite3.connect("User_db.db")
-#         cursor_db_login = user_db_login.cursor()
-#
-#         user_db_login.create_function("md5", 1, call_number)
-#
-#         cursor_db_login.execute("SELECT login FROM users WHERE login = ?", [user_login])
-#         if cursor_db_login.fetchone() is NONE:
-#             print("такого логина нету")
-#         else:
-#             cursor_db_login.execute("SELECT password FROM users WHERE login = ? AND"
-#                                     " password = md5(?)", [user_login, user_password])
-#             if cursor_db_login.fetchone() is NONE:
-#                 print("Пароль не верный")
-#             else:
-#                 print("Пароль верный")
-#     except sqlite3.Error as e:
-#         print("Error", e)
-#     finally:
-#         cursor_db_login.close()
-#         user_db_login.close()
-
-
 form_main.pushButton_2.clicked.connect(starter)
 form_main.registration_window.clicked.connect(reg_open)
 form_main.pushButton.clicked.connect(new_task_open)
-form_new_task.pushButton.clicked.connect(create_new_task)
+form_new_task.create_new_task.clicked.connect(create_new_task)
 form_reg.register_button.clicked.connect(reg_one_open)
 form_reg.login_button.clicked.connect(reg_close)
 form_reg_one.login_button.clicked.connect(reg_one_close)
