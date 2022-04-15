@@ -18,7 +18,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication
 
 
-Form_main, Window_main = uic.loadUiType("untitled.ui")
+Form_main, Window_main = uic.loadUiType("untitled_2.ui")
 Form_new_task, Window_new_task = uic.loadUiType("untitled_new_task.ui")
 Form_reg, Window_reg = uic.loadUiType("untitled_reg.ui")
 Form_reg_one, Window_reg_one = uic.loadUiType("untitled_reg_one.ui")
@@ -123,38 +123,12 @@ def restarter():
         if none_login_task is None:
             form_main.user_data.setText("Войдите в аккаунт")
         else:
-            cursor_db_task.execute("SELECT name_task_one FROM tasks WHERE user_login = ?", [user_login])
+            cursor_db_task.execute("SELECT name_task_one, status_task_one, group_task_one, ball_one FROM tasks WHERE user_login = ?", [user_login])
             user_db_task.commit()
-            name_task = cursor_db_task.fetchone()
-            form_main.name_task_1.setText(str(name_task[0]))
-            cursor_db_task.execute("SELECT status_task_one FROM tasks WHERE user_login = ?", [user_login])
-            user_db_task.commit()
-            name_status = cursor_db_task.fetchone()
-            form_main.name_status_1.setText(str(name_status[0]))
-            cursor_db_task.execute("SELECT group_task_one FROM tasks WHERE user_login = ?", [user_login])
-            user_db_task.commit()
-            name_group = cursor_db_task.fetchone()
-            form_main.name_group_1.setText(str(name_group[0]))
-            cursor_db_task.execute("SELECT ball_one FROM tasks WHERE user_login = ?", [user_login])
-            user_db_task.commit()
-            ball_one = cursor_db_task.fetchone()
-            form_main.ball_1.setText(str(ball_one[0]))
+            ar = cursor_db_task.fetchone()
+            form_main.listWidget.addItem(str(ar))
+            print(ar)
 
-            cursor_db_task.execute("SELECT lead_time_one FROM tasks WHERE user_login = ?", [user_login])
-            user_db_task.commit()
-            datetime.lead_time = cursor_db_task.fetchone()
-            lead_time_0 = datetime.lead_time[0]
-            # lead_time_1 = datetime.strptime(lead_time_0, '%Y-%m-%d')
-            to_day = datetime.date.today()
-            # pas = to_day.DaysTo(lead_time_1)
-            # datetime.timedelta()
-            # datetime.pas = to_day.daysTo(datetime.lead_time_1)
-            print(lead_time_0, " ", to_day)
-            # lead_time_one = form_new_task.lead_time.date()
-            # lead_time_one_con = lead_time_one.toPyDate()
-            # data_task = form_new_task.dateEdit.date()
-            # to_day = form_main.dateEdit.date()
-            # pas_day = to_day.daysTo(data_task)
     except sqlite3.Error as err:
         form_new_task.error_new_task.setText(err)
     finally:
@@ -222,6 +196,93 @@ def create_new_task(user_login):
 
     # test = form_main.calendarWidget.selectedDate().addDays(+pas_day)
     # print(test)
+
+
+def upgrade_new_task(user_login):
+    id_task = form_new_task.id_task.text()
+    name_task_one = form_new_task.name_task.text()
+    status_task_one = form_new_task.status_task.currentText()
+    description_task_one = form_new_task.description_task.toPlainText()
+    ball_one = form_new_task.ball.text()
+    group_task_one = form_new_task.group_task.text()
+    lead_time_one = form_new_task.lead_time.date()
+    lead_time_one_con = lead_time_one.toPyDate()
+    user_login = "Alex_1"
+
+    if not name_task_one or not status_task_one or not description_task_one or not ball_one or not group_task_one or not lead_time_one:
+        form_new_task.error_new_task.setText("Проверьте заполненость всех полей")
+    else:
+        try:
+            user_db_task = sqlite3.connect("User_db.db")
+            cursor_db_task = user_db_task.cursor()
+
+            cursor_db_task.execute("SELECT user_login FROM tasks WHERE user_login = ? AND name_task_one = ?",
+                                   [user_login, name_task_one])
+            user_db_task.commit()
+
+            task_db = [name_task_one, status_task_one, description_task_one, ball_one, group_task_one, lead_time_one_con, user_login, id_task]
+
+            cursor_db_task.execute("UPDATE tasks SET name_task_one = ?, status_task_one = ?, description_task_one = ?,"
+                                   " ball_one = ?, group_task_one = ?, lead_time_one = ? WHERE"
+                                   " user_login = ? AND id = ?", task_db)
+            user_db_task.commit()
+            form_new_task.error_new_task.setText("Успешно обновлено")
+        except sqlite3.Error as err:
+            form_new_task.error_new_task.setText(err)
+        finally:
+            cursor_db_task.close()
+            user_db_task.close()
+
+
+def upgrade_task():
+    user_login = form_main.user_login.text()
+    create_new_task(user_login)
+
+    window_new_task.show()
+    form_new_task.error_new_task.setText("")
+
+    user_login = "Alex_1"
+    name_task_one = "Варк"
+    try:
+        user_db_task = sqlite3.connect("User_db.db")
+        cursor_db_task = user_db_task.cursor()
+
+        cursor_db_task.execute("SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                               "lead_time_one, id FROM tasks WHERE user_login = ? AND name_task_one = ?",
+                               [user_login, name_task_one])
+        user_db_task.commit()
+        rec = cursor_db_task.fetchall()
+
+        for row in rec:
+            form_new_task.name_task.setText(row[0])
+            form_new_task.status_task.setCurrentText(row[1])
+            form_new_task.description_task.setText(row[2])
+            form_new_task.ball.setValue(int(row[3]))
+            form_new_task.group_task.setText(row[4])
+            s = str(row[5])
+            form_new_task.id_task.setText(str(row[6]))
+
+        year_task = int(s[0])*1000+int(s[1])*100+int(s[2])*10+int(s[3])
+        month_task = int(s[5])*10+int(s[6])
+        day_task = int(s[8])*10+int(s[9])
+
+        day = datetime.date(year_task, month_task, day_task)
+        form_new_task.lead_time.setDate(day)
+
+    except sqlite3.Error as err:
+        form_new_task.error_new_task.setText(err)
+    finally:
+        cursor_db_task.close()
+        user_db_task.close()
+
+
+
+# def delete_task(user_login):
+#     a = 2
+#
+#
+# def accept_task(user_login):
+#     a = 3
 
 
 def reg_open():
@@ -315,6 +376,10 @@ def reg_one_close():
             user_db_reg.close()
 
 
+form_new_task.upgrade_new_task.clicked.connect(upgrade_new_task)
+form_main.upgrade_task_window_2.clicked.connect(upgrade_task)
+# form_main.delete_task_window_2.clicked.connect(delete_task)
+# form_main.accept_task_window_2.clicked.connect(accept_task)
 form_main.restart.clicked.connect(restarter)
 form_main.registration_window.clicked.connect(reg_open)
 form_main.new_task_window.clicked.connect(new_task_open)
