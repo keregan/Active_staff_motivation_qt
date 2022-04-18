@@ -132,11 +132,32 @@ def restarter():
         if none_login_task is None:
             form_main.user_data.setText("Войдите в аккаунт")
         else:
-            cursor_db_task.execute("SELECT name_task_one, status_task_one, group_task_one, ball_one FROM tasks WHERE user_login = ?", [user_login])
+            # cursor_db_task.execute("SELECT name_task_one, status_task_one, group_task_one, ball_one FROM tasks WHERE user_login = ?", [user_login])
+            # user_db_task.commit()
+            #
+            # ar = cursor_db_task.fetchone()
+            # form_main.listWidget.addItem(str(ar))
+
+            cursor_db_task.execute(
+                "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                "lead_time_one FROM tasks WHERE user_login = ?",
+                [user_login])
             user_db_task.commit()
-            ar = cursor_db_task.fetchone()
-            form_main.listWidget.addItem(str(ar))
-            form_main.number_task.setText("")
+            rec = cursor_db_task.fetchall()
+
+            for row in rec:
+                # form_upgrade_task.name_task.setText(row[0])
+                # form_upgrade_task.status_task.setCurrentText(row[1])
+                # form_upgrade_task.description_task.setText(row[2])
+                # form_upgrade_task.ball.setValue(int(row[3]))
+                # form_upgrade_task.group_task.setText(row[4])
+                # s = str(row[5])
+                new_str_task = "Задача #" + (row[0]) + "\tСтатус:" + (row[1]) + "\tБаллы: " + (str(row[3])) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
+                form_main.listWidget.addItem(str(new_str_task))
+            # year_task = int(s[0]) * 1000 + int(s[1]) * 100 + int(s[2]) * 10 + int(s[3])
+            # month_task = int(s[5]) * 10 + int(s[6])
+            # day_task = int(s[8]) * 10 + int(s[9])
+
             main_form()
     except sqlite3.Error as err:
         form_new_task.error_new_task.setText(err)
