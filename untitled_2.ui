@@ -61,7 +61,7 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>360</x>
       <y>530</y>
       <width>71</width>
       <height>16</height>
@@ -123,7 +123,7 @@
    <widget class="QLabel" name="ball">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>360</x>
       <y>550</y>
       <width>51</width>
       <height>20</height>
@@ -215,7 +215,7 @@
      <string>Изменение задачи</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="delete_task_window_3">
+   <widget class="QPushButton" name="delete_task_window">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -228,7 +228,7 @@
      <string>Удаление задачи</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="accept_task_window_4">
+   <widget class="QPushButton" name="accept_task_window">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -239,6 +239,45 @@
     </property>
     <property name="text">
      <string>Выполненение задачи</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="error_task">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>500</y>
+      <width>281</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>550</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Номер задачи</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="number_task">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>550</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>2</string>
     </property>
    </widget>
   </widget>
