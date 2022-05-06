@@ -736,7 +736,7 @@ def task_old_open():
 
 def task_old_open_admin():
     while form_task_old.tableWidgetf.rowCount() > 0:
-        form_admin.tableWidgetf.removeRow(0)
+        form_task_old.tableWidgetf.removeRow(0)
     user_login = form_admin.user_l.text()
 
     if not user_login:
