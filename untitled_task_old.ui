@@ -6,101 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>632</width>
-    <height>356</height>
+    <width>730</width>
+    <height>453</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>730</width>
+    <height>453</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>730</width>
+    <height>453</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Выполненые задачи</string>
   </property>
-  <widget class="QListWidget" name="tasks_list">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>611</width>
-     <height>301</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="filter">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>20</y>
-     <width>171</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>ID по возрастанию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>ID по убыванию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Название по возрастанию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Название по убыванию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Статус по возрастанию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Статус по убыванию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Группа по возрастанию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Группа по убыванию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Дата по возрастанию</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Дата по убыванию</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QPushButton" name="filter_button">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>101</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Фильтр</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="task_old_close">
    <property name="geometry">
     <rect>
-     <x>540</x>
-     <y>20</y>
+     <x>640</x>
+     <y>0</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -108,6 +37,65 @@
    <property name="text">
     <string>Выход</string>
    </property>
+  </widget>
+  <widget class="QTableWidget" name="tableWidgetf">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>711</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>9999</width>
+     <height>9999</height>
+    </size>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectRows</enum>
+   </property>
+   <property name="sortingEnabled">
+    <bool>true</bool>
+   </property>
+   <column>
+    <property name="text">
+     <string>ID</string>
+    </property>
+    <property name="textAlignment">
+     <set>AlignCenter</set>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Название</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Статус</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Группа</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Дата</string>
+    </property>
+   </column>
   </widget>
  </widget>
  <resources/>

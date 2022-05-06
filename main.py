@@ -139,7 +139,6 @@ def main_form():
 def restarter():
     try:
         form_main.tableWidgetf.clearContents()
-        form_main.tasks_list.clear()
         user_db_task = sqlite3.connect("User_db.db")
         cursor_db_task = user_db_task.cursor()
 
@@ -170,13 +169,17 @@ def restarter():
             c_all = cursor_db_task.fetchone()
             form_main.tableWidgetf.setRowCount(int(c_all[0]))
 
-
             cursor_db_task.execute(
                 "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
                 "lead_time_one, id FROM tasks WHERE user_login = ?",
                 [user_login])
             user_db_task.commit()
             rec = cursor_db_task.fetchall()
+
+            form_main.tableWidgetf.setColumnWidth(0, 20)
+            form_main.tableWidgetf.setColumnWidth(1, 200)
+            form_main.tableWidgetf.setColumnWidth(3, 155)
+
             j_ps = 0
             for row in rec:
                 ball_s = str(row[3])
@@ -590,49 +593,34 @@ def reg_one_close():
 
 
 def item_click(item):
-
-    str_task = item.text()
-    str_num = int(len(str_task))
-    number = 4
-
-    while number < str_num and str_task[number] != " ":
-        if number == 4:
-            id_task = str_task[number]
-        else:
-            id_task = id_task + str_task[number]
-        number = number + 1
-    form_main.number_task.setText(id_task)
+    str_task = item.row()
+    id_task = form_admin.tableWidgetf.item(str_task, 0).text()
     user_login = form_main.user_login.text()
-    id_task = form_main.number_task.text()
     try:
         user_db_task = sqlite3.connect("User_db.db")
         cursor_db_task = user_db_task.cursor()
 
-        cursor_db_task.execute("SELECT id FROM tasks WHERE user_login = ? AND id = ?", [user_login, id_task])
+        cursor_db_task.execute(
+            "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+            "lead_time_one FROM tasks WHERE user_login = ? AND id = ?", [user_login, id_task])
         user_db_task.commit()
-        err_id = cursor_db_task.fetchone()
+        rec = cursor_db_task.fetchall()
 
-        if err_id is None:
-            form_main.error_task.setText("Такого id задачи нету")
-        else:
-            cursor_db_task.execute("SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                "lead_time_one FROM tasks WHERE user_login = ? AND id= ?", [user_login, id_task])
-            user_db_task.commit()
-            rec = cursor_db_task.fetchall()
-            for row in rec:
-                form_main.name_task.setText(row[0])
-                form_main.status_task.setText(row[1])
-                form_main.description_task.setText(row[2])
-                form_main.ball_2.setText(str(row[3]))
-                form_main.group_task.setText(row[4])
-                s = str(row[5])
+        for row in rec:
+            form_main.name_task.setText(row[0])
+            form_main.status_task.setCurrentText(row[1])
+            form_main.description_task.setText(row[2])
+            form_main.ball.setValue(int(row[3]))
+            form_main.group_task.setText(row[4])
+            s = str(row[5])
+        year_task = int(s[0]) * 1000 + int(s[1]) * 100 + int(s[2]) * 10 + int(s[3])
+        month_task = int(s[5]) * 10 + int(s[6])
+        day_task = int(s[8]) * 10 + int(s[9])
 
-            year_task = int(s[0]) * 1000 + int(s[1]) * 100 + int(s[2]) * 10 + int(s[3])
-            month_task = int(s[5]) * 10 + int(s[6])
-            day_task = int(s[8]) * 10 + int(s[9])
+        day = datetime.date(year_task, month_task, day_task)
+        form_main.lead_time.setDate(day)
+        form_main.id_task.setText(str(id_task))
 
-            day = datetime.date(year_task, month_task, day_task)
-            form_main.date_task.setText(str(day))
     except sqlite3.Error as err:
         form_new_task.error_new_task.setText(err)
     finally:
@@ -696,157 +684,9 @@ def date_click():
             user_db_task.close()
 
 
-def filter_click():
-    form_main.tasks_list.clear()
-    sort = form_main.filter.currentText()
-    user_login = form_main.user_login.text()
-
-    if not user_login or user_login == "Войдите в аккаунт":
-        form_main.user_data.setText("Войдите в аккаунт")
-    else:
-        try:
-            user_db_task = sqlite3.connect("User_db.db")
-            cursor_db_task = user_db_task.cursor()
-            if sort == "ID по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY id",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Название по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY name_task_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Статус по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY status_task_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Группа по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY group_task_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Дата по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY lead_time_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + " Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "ID по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY id DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Название по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY name_task_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Статус по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY status_task_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Группа по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY group_task_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-            elif sort == "Дата по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks WHERE user_login = ? ORDER BY lead_time_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + " Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_main.tasks_list.addItem(str(new_str_task))
-
-        except sqlite3.Error as err:
-            form_main.error_task.setText(err)
-        finally:
-            cursor_db_task.close()
-            user_db_task.close()
-
-
 def task_old_open():
-    form_task_old.tasks_list.clear()
+    while form_task_old.tableWidgetf.rowCount() > 0:
+        form_admin.tableWidgetf.removeRow(0)
     user_login = form_main.user_login.text()
 
     if not user_login or user_login == "Войдите в аккаунт":
@@ -857,18 +697,35 @@ def task_old_open():
             user_db_task = sqlite3.connect("User_db.db")
             cursor_db_task = user_db_task.cursor()
 
+            cursor_db_task.execute("SELECT count(*) FROM tasks_old WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            c_all = cursor_db_task.fetchone()
+            form_task_old.tableWidgetf.setRowCount(int(c_all[0]))
+
             cursor_db_task.execute(
-                "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                "lead_time_one, id FROM tasks_old WHERE user_login = ?",
-                [user_login])
+                "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                "lead_time_one, id FROM tasks_old WHERE user_login = ?", [user_login])
             user_db_task.commit()
             rec = cursor_db_task.fetchall()
+            j_ps = 0
+
+            form_task_old.tableWidgetf.setColumnWidth(0, 20)
+            form_task_old.tableWidgetf.setColumnWidth(1, 250)
+            form_task_old.tableWidgetf.setColumnWidth(3, 205)
 
             for row in rec:
                 ball_s = str(row[3])
-                new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + (row[1]) \
-                               + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                form_task_old.tasks_list.addItem(str(new_str_task))
+                str_row_6 = QTableWidgetItem(str(row[6]))
+                form_task_old.tableWidgetf.setItem(j_ps, 0, str_row_6)
+                str_row_0 = QTableWidgetItem(str(row[0]))
+                form_task_old.tableWidgetf.setItem(j_ps, 1, str_row_0)
+                str_row_1 = QTableWidgetItem(str(row[1]))
+                form_task_old.tableWidgetf.setItem(j_ps, 2, str_row_1)
+                str_row_2 = QTableWidgetItem(str(row[2]))
+                form_task_old.tableWidgetf.setItem(j_ps, 3, str_row_2)
+                str_row_5 = QTableWidgetItem(str(row[5]))
+                form_task_old.tableWidgetf.setItem(j_ps, 4, str_row_5)
+                j_ps = j_ps + 1
 
         except sqlite3.Error as err:
             form_new_task.error_new_task.setText(err)
@@ -877,161 +734,9 @@ def task_old_open():
             user_db_task.close()
 
 
-def filter_click_task_old():
-    form_task_old.tasks_list.clear()
-    sort = form_task_old.filter.currentText()
-    user_login = form_main.user_login.text()
-
-    if not user_login or user_login == "Войдите в аккаунт":
-        form_main.user_data.setText("Войдите в аккаунт")
-    else:
-        try:
-            user_db_task = sqlite3.connect("User_db.db")
-            cursor_db_task = user_db_task.cursor()
-            if sort == "ID по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY id",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-
-            elif sort == "Название по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY name_task_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "Статус по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY status_task_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "Группа по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY group_task_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "Дата по возрастанию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY lead_time_one",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + " Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "ID по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY id DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "Название по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY name_task_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "Статус по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY status_task_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "Группа по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY group_task_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-            elif sort == "Дата по убыванию":
-                cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                    "lead_time_one, id FROM tasks_old WHERE user_login = ? ORDER BY lead_time_one DESC",
-                    [user_login])
-                user_db_task.commit()
-                rec = cursor_db_task.fetchall()
-
-                for row in rec:
-                    ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + " Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_task_old.tasks_list.addItem(str(new_str_task))
-
-        except sqlite3.Error as err:
-            form_main.error_task.setText(err)
-        finally:
-            cursor_db_task.close()
-            user_db_task.close()
-
-
-def task_old_close():
-    window_task_old.close()
-
-
 def task_old_open_admin():
-    form_task_old.tasks_list.clear()
+    while form_task_old.tableWidgetf.rowCount() > 0:
+        form_admin.tableWidgetf.removeRow(0)
     user_login = form_admin.user_l.text()
 
     if not user_login:
@@ -1042,18 +747,35 @@ def task_old_open_admin():
             user_db_task = sqlite3.connect("User_db.db")
             cursor_db_task = user_db_task.cursor()
 
+            cursor_db_task.execute("SELECT count(*) FROM tasks_old WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            c_all = cursor_db_task.fetchone()
+            form_task_old.tableWidgetf.setRowCount(int(c_all[0]))
+
             cursor_db_task.execute(
-                "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                "lead_time_one, id FROM tasks_old WHERE user_login = ?",
-                [user_login])
+                "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                "lead_time_one, id FROM tasks_old WHERE user_login = ?", [user_login])
             user_db_task.commit()
             rec = cursor_db_task.fetchall()
+            j_ps = 0
+
+            form_task_old.tableWidgetf.setColumnWidth(0, 20)
+            form_task_old.tableWidgetf.setColumnWidth(1, 250)
+            form_task_old.tableWidgetf.setColumnWidth(3, 205)
 
             for row in rec:
                 ball_s = str(row[3])
-                new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + (row[1]) \
-                               + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                form_task_old.tasks_list.addItem(str(new_str_task))
+                str_row_6 = QTableWidgetItem(str(row[6]))
+                form_task_old.tableWidgetf.setItem(j_ps, 0, str_row_6)
+                str_row_0 = QTableWidgetItem(str(row[0]))
+                form_task_old.tableWidgetf.setItem(j_ps, 1, str_row_0)
+                str_row_1 = QTableWidgetItem(str(row[1]))
+                form_task_old.tableWidgetf.setItem(j_ps, 2, str_row_1)
+                str_row_2 = QTableWidgetItem(str(row[2]))
+                form_task_old.tableWidgetf.setItem(j_ps, 3, str_row_2)
+                str_row_5 = QTableWidgetItem(str(row[5]))
+                form_task_old.tableWidgetf.setItem(j_ps, 4, str_row_5)
+                j_ps = j_ps + 1
 
         except sqlite3.Error as err:
             form_new_task.error_new_task.setText(err)
@@ -1063,48 +785,95 @@ def task_old_open_admin():
 
 
 def admin_open():
-    window_admin.show()
-    form_admin.lead_time.setMinimumDate(datetime.date.today())
+    user_login = form_main.user_login.text()
+    if not user_login or user_login == "Войдите в аккаунт":
+        form_main.user_data.setText("Войдите в аккаунт")
+    else:
+        try:
+            user_db_task = sqlite3.connect("User_db.db")
+            cursor_db_task = user_db_task.cursor()
 
-    try:
-        form_admin.tasks_list_all.clear()
-        form_admin.tasks_list_all_2.clear()
-        user_db_task = sqlite3.connect("User_db.db")
-        cursor_db_task = user_db_task.cursor()
+            cursor_db_task.execute("SELECT position FROM users WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            position_admin = cursor_db_task.fetchone()
+            position_admin_2 = str(position_admin[0])
+            print(position_admin_2)
+            if position_admin_2 != "admin":
+                form_main.err_admin.setText("Нет доступа")
+            else:
+                window_admin.show()
+                form_admin.user_l.setText("")
+                form_admin.lead_time.setMinimumDate(datetime.date.today())
+                form_admin.tableWidgetf.clearContents()
+                form_admin.tableWidgetf_2.clearContents()
 
-        cursor_db_task.execute(
-            "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-            "lead_time_one, id FROM tasks")
-        user_db_task.commit()
-        rec = cursor_db_task.fetchall()
+                cursor_db_task.execute("SELECT count(*) FROM tasks")
+                user_db_task.commit()
+                c_all = cursor_db_task.fetchone()
+                form_admin.tableWidgetf.setRowCount(int(c_all[0]))
 
-        for row in rec:
-            ball_s = str(row[3])
-            new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + (row[1]) \
-                           + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-            form_admin.tasks_list_all.addItem(str(new_str_task))
-        # year_task = int(s[0]) * 1000 + int(s[1]) * 100 + int(s[2]) * 10 + int(s[3])
-        # month_task = int(s[5]) * 10 + int(s[6])
-        # day_task = int(s[8]) * 10 + int(s[9])
+                cursor_db_task.execute(
+                    "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                    "lead_time_one, id FROM tasks")
+                user_db_task.commit()
+                rec = cursor_db_task.fetchall()
+                j_ps = 0
 
-        cursor_db_task.execute(
-            "SELECT first_name, second_name, position, ball, id FROM users")
-        user_db_task.commit()
-        rec = cursor_db_task.fetchall()
+                form_admin.tableWidgetf.setColumnWidth(0, 20)
+                form_admin.tableWidgetf.setColumnWidth(1, 250)
+                form_admin.tableWidgetf.setColumnWidth(3, 205)
 
-        for row in rec:
-            ball_s = str(row[3])
-            new_str_task = "ID: " + (str(row[4])) + " " + (str(row[0])) + " " + (row[1]) + "   " + (row[2]) + "   " + ball_s
-            form_admin.tasks_list_all_2.addItem(str(new_str_task))
+                for row in rec:
+                    ball_s = str(row[3])
+                    str_row_6 = QTableWidgetItem(str(row[6]))
+                    form_admin.tableWidgetf.setItem(j_ps, 0, str_row_6)
+                    str_row_0 = QTableWidgetItem(str(row[0]))
+                    form_admin.tableWidgetf.setItem(j_ps, 1, str_row_0)
+                    str_row_1 = QTableWidgetItem(str(row[1]))
+                    form_admin.tableWidgetf.setItem(j_ps, 2, str_row_1)
+                    str_row_2 = QTableWidgetItem(str(row[2]))
+                    form_admin.tableWidgetf.setItem(j_ps, 3, str_row_2)
+                    str_row_5 = QTableWidgetItem(str(row[5]))
+                    form_admin.tableWidgetf.setItem(j_ps, 4, str_row_5)
+                    j_ps = j_ps + 1
 
-    except sqlite3.Error as err:
-        form_new_task.error_new_task.setText(err)
-    finally:
-        cursor_db_task.close()
-        user_db_task.close()
+                cursor_db_task.execute("SELECT count(*) FROM users")
+                user_db_task.commit()
+                c_all = cursor_db_task.fetchone()
+                form_admin.tableWidgetf_2.setRowCount(int(c_all[0]))
+
+                cursor_db_task.execute("SELECT first_name, second_name, position, ball, id FROM users")
+                user_db_task.commit()
+                rec = cursor_db_task.fetchall()
+
+                form_admin.tableWidgetf_2.setColumnWidth(0, 10)
+                form_admin.tableWidgetf_2.setColumnWidth(1, 115)
+                form_admin.tableWidgetf_2.setColumnWidth(2, 100)
+                form_admin.tableWidgetf_2.setColumnWidth(3, 50)
+
+                j_ps = 0
+                for row in rec:
+                    str_row_4 = QTableWidgetItem(str(row[4]))
+                    form_admin.tableWidgetf_2.setItem(j_ps, 0, str_row_4)
+                    f_s_p = str(row[0]) + " " + str(row[1])
+                    str_row_0 = QTableWidgetItem(str(f_s_p))
+                    form_admin.tableWidgetf_2.setItem(j_ps, 1, str_row_0)
+                    str_row_2 = QTableWidgetItem(str(row[2]))
+                    form_admin.tableWidgetf_2.setItem(j_ps, 2, str_row_2)
+                    str_row_3 = QTableWidgetItem(str(row[3]))
+                    form_admin.tableWidgetf_2.setItem(j_ps, 3, str_row_3)
+                    j_ps = j_ps + 1
+
+        except sqlite3.Error as err:
+            form_new_task.error_new_task.setText(err)
+        finally:
+            cursor_db_task.close()
+            user_db_task.close()
 
 
 def create_new_task_admin():
+    while form_admin.tableWidgetf.rowCount() > 0:
+        form_admin.tableWidgetf.removeRow(0)
     user_login = form_admin.user_l.text()
     name_task_one = form_admin.name_task.text()
     status_task_one = form_admin.status_task.currentText()
@@ -1139,19 +908,35 @@ def create_new_task_admin():
                 user_db_task.commit()
                 form_admin.error_new_task.setText("Задача создана")
 
-                form_admin.tasks_list_all.clear()
+                cursor_db_task.execute("SELECT count(*) FROM tasks WHERE user_login = ?", [user_login])
+                user_db_task.commit()
+                c_all = cursor_db_task.fetchone()
+                form_admin.tableWidgetf.setRowCount(int(c_all[0]))
 
                 cursor_db_task.execute(
-                    "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                    "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
                     "lead_time_one, id FROM tasks WHERE user_login = ?", [user_login])
                 user_db_task.commit()
                 rec = cursor_db_task.fetchall()
+                j_ps = 0
+
+                form_admin.tableWidgetf.setColumnWidth(0, 20)
+                form_admin.tableWidgetf.setColumnWidth(1, 250)
+                form_admin.tableWidgetf.setColumnWidth(3, 205)
 
                 for row in rec:
                     ball_s = str(row[3])
-                    new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + \
-                                   (row[1]) + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-                    form_admin.tasks_list_all.addItem(str(new_str_task))
+                    str_row_6 = QTableWidgetItem(str(row[6]))
+                    form_admin.tableWidgetf.setItem(j_ps, 0, str_row_6)
+                    str_row_0 = QTableWidgetItem(str(row[0]))
+                    form_admin.tableWidgetf.setItem(j_ps, 1, str_row_0)
+                    str_row_1 = QTableWidgetItem(str(row[1]))
+                    form_admin.tableWidgetf.setItem(j_ps, 2, str_row_1)
+                    str_row_2 = QTableWidgetItem(str(row[2]))
+                    form_admin.tableWidgetf.setItem(j_ps, 3, str_row_2)
+                    str_row_5 = QTableWidgetItem(str(row[5]))
+                    form_admin.tableWidgetf.setItem(j_ps, 4, str_row_5)
+                    j_ps = j_ps + 1
 
             else:
                 form_admin.error_new_task.setText("Запись с таким названием уже имеется")
@@ -1162,79 +947,27 @@ def create_new_task_admin():
             user_db_task.close()
 
 
-def item_click_admin(item):
-
-    form_admin.tasks_list_all.clear()
-    str_task = item.text()
-    str_num = int(len(str_task))
-    number = 4
-
-    while number < str_num and str_task[number] != " ":
-        if number == 4:
-            id_task = str_task[number]
-        else:
-            id_task = id_task + str_task[number]
-        number = number + 1
-
-    try:
-        user_db_task = sqlite3.connect("User_db.db")
-        cursor_db_task = user_db_task.cursor()
-
-        cursor_db_task.execute(
-            "SELECT user_login FROM users WHERE id = ?", [id_task])
-        user_db_task.commit()
-
-        user_login1 = cursor_db_task.fetchone()
-        user_login = str(user_login1[0])
-
-        form_admin.user_l.setText(str(user_login))
-
-        cursor_db_task.execute(
-            "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-            "lead_time_one, id FROM tasks WHERE user_login = ?", [user_login])
-        user_db_task.commit()
-        rec = cursor_db_task.fetchall()
-
-        for row in rec:
-            ball_s = str(row[3])
-            new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + (row[1]) \
-                           + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-            form_admin.tasks_list_all.addItem(str(new_str_task))
-    except sqlite3.Error as err:
-        form_admin.error_new_task.setText(err)
-    finally:
-        cursor_db_task.close()
-        user_db_task.close()
-
-
 def item_click_admin_one(item):
-
     user_login = form_admin.user_l.text()
-    str_task = item.text()
-    str_num = int(len(str_task))
-    number = 4
 
-    while number < str_num and str_task[number] != "Н":
-        if number == 4:
-            id_task = str_task[number]
-        else:
-            id_task = id_task + str_task[number]
-        number = number + 1
-    if not user_login or not id_task:
+    if not user_login:
         form_admin.error_new_task.setText("Выберите пользователя")
     else:
+        while form_task_old.tableWidgetf.rowCount() > 0:
+            form_admin.tableWidgetf.removeRow(0)
+        str_task = item.row()
+        id_task = form_admin.tableWidgetf.item(str_task, 0).text()
+        user_login = form_admin.user_l.text()
         try:
-
             user_db_task = sqlite3.connect("User_db.db")
             cursor_db_task = user_db_task.cursor()
 
-            form_upgrade_task.error_new_task.setText("")
-            cursor_db_task.execute("SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
-                                   "lead_time_one FROM tasks WHERE user_login = ? AND id= ?",
-                                   [user_login, id_task])
+            cursor_db_task.execute(
+                "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                "lead_time_one FROM tasks WHERE user_login = ? AND id = ?", [user_login, id_task])
             user_db_task.commit()
-
             rec = cursor_db_task.fetchall()
+
             for row in rec:
                 form_admin.name_task.setText(row[0])
                 form_admin.status_task.setCurrentText(row[1])
@@ -1251,10 +984,59 @@ def item_click_admin_one(item):
             form_admin.id_task.setText(str(id_task))
 
         except sqlite3.Error as err:
-            form_admin.error_new_task.setText(err)
+            form_new_task.error_new_task.setText(err)
         finally:
             cursor_db_task.close()
             user_db_task.close()
+
+
+def item_click_admin(item):
+    while form_admin.tableWidgetf.rowCount() > 0:
+        form_admin.tableWidgetf.removeRow(0)
+    str_task = item.row()
+    id_person = form_admin.tableWidgetf_2.item(str_task, 0).text()
+    try:
+        user_db_task = sqlite3.connect("User_db.db")
+        cursor_db_task = user_db_task.cursor()
+
+        cursor_db_task.execute("SELECT user_login FROM users WHERE id = ?", [id_person])
+        user_db_task.commit()
+
+        user_login1 = cursor_db_task.fetchone()
+        user_login = str(user_login1[0])
+        form_admin.user_l.setText(user_login)
+
+        cursor_db_task.execute("SELECT count(*) FROM tasks WHERE user_login = ?", [user_login])
+        user_db_task.commit()
+        c_all = cursor_db_task.fetchone()
+        form_admin.tableWidgetf.setRowCount(int(c_all[0]))
+
+        cursor_db_task.execute(
+            "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+            "lead_time_one, id FROM tasks WHERE user_login = ?", [user_login])
+        user_db_task.commit()
+        rec = cursor_db_task.fetchall()
+        j_ps = 0
+
+        for row in rec:
+            ball_s = str(row[3])
+            str_row_6 = QTableWidgetItem(str(row[6]))
+            form_admin.tableWidgetf.setItem(j_ps, 0, str_row_6)
+            str_row_0 = QTableWidgetItem(str(row[0]))
+            form_admin.tableWidgetf.setItem(j_ps, 1, str_row_0)
+            str_row_1 = QTableWidgetItem(str(row[1]))
+            form_admin.tableWidgetf.setItem(j_ps, 2, str_row_1)
+            str_row_2 = QTableWidgetItem(str(row[2]))
+            form_admin.tableWidgetf.setItem(j_ps, 3, str_row_2)
+            str_row_5 = QTableWidgetItem(str(row[5]))
+            form_admin.tableWidgetf.setItem(j_ps, 4, str_row_5)
+            j_ps = j_ps + 1
+
+    except sqlite3.Error as err:
+        form_new_task.error_new_task.setText(err)
+    finally:
+        cursor_db_task.close()
+        user_db_task.close()
 
 
 def upgrade_task_admin():
@@ -1272,7 +1054,6 @@ def upgrade_task_admin():
         form_admin.error_new_task.setText("Проверьте заполненость всех полей")
     else:
         try:
-            print("test1")
             user_db_task = sqlite3.connect("User_db.db")
             cursor_db_task = user_db_task.cursor()
 
@@ -1322,11 +1103,10 @@ def delete_task_admin():
                 user_db_task.commit()
                 none_name_task = cursor_db_task.fetchone()
                 if none_name_task is None:
-                    form_main.error_task.setText("Ошибка удаления")
+                    form_admin.error_task.setText("Ошибка удаления")
                 else:
                     cursor_db_task.execute("DELETE FROM tasks WHERE user_login = ? AND id = ?", [user_login, id_task])
                 user_db_task.commit()
-
                 form_admin.error_new_task.setText("Успешно удалено")
 
                 form_admin.name_task.setText("")
@@ -1346,23 +1126,39 @@ def delete_task_admin():
 
 
 def restarter_admin():
-    form_admin.tasks_list_all.clear()
-
+    while form_admin.tableWidgetf.rowCount() > 0:
+        form_admin.tableWidgetf.removeRow(0)
     try:
         user_db_task = sqlite3.connect("User_db.db")
         cursor_db_task = user_db_task.cursor()
         user_login = form_admin.user_l.text()
+
+        cursor_db_task.execute("SELECT count(*) FROM tasks WHERE user_login = ?", [user_login])
+        user_db_task.commit()
+        c_all = cursor_db_task.fetchone()
+        form_admin.tableWidgetf.setRowCount(int(c_all[0]))
+
         cursor_db_task.execute(
-            "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+            "SELECT  name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
             "lead_time_one, id FROM tasks WHERE user_login = ?", [user_login])
         user_db_task.commit()
         rec = cursor_db_task.fetchall()
+        j_ps = 0
 
         for row in rec:
             ball_s = str(row[3])
-            new_str_task = "ID: " + (str(row[6])) + " " + "Название задачи: " + (row[0]) + "\tСтатус:" + (row[1]) \
-                           + "\tГруппа: " + (row[4]) + "\tДата: " + (str(row[5]))
-            form_admin.tasks_list_all.addItem(str(new_str_task))
+            str_row_6 = QTableWidgetItem(str(row[6]))
+            form_admin.tableWidgetf.setItem(j_ps, 0, str_row_6)
+            str_row_0 = QTableWidgetItem(str(row[0]))
+            form_admin.tableWidgetf.setItem(j_ps, 1, str_row_0)
+            str_row_1 = QTableWidgetItem(str(row[1]))
+            form_admin.tableWidgetf.setItem(j_ps, 2, str_row_1)
+            str_row_2 = QTableWidgetItem(str(row[2]))
+            form_admin.tableWidgetf.setItem(j_ps, 3, str_row_2)
+            str_row_5 = QTableWidgetItem(str(row[5]))
+            form_admin.tableWidgetf.setItem(j_ps, 4, str_row_5)
+            j_ps = j_ps + 1
+
     except sqlite3.Error as err:
         form_admin.error_new_task.setText(err)
     finally:
@@ -1418,15 +1214,12 @@ form_main.tableWidgetf.itemClicked.connect(item_click_table)
 form_main.tableWidgetf.itemDoubleClicked.connect(restarter)
 form_admin.delete_task.clicked.connect(delete_task_admin)
 form_admin.upgrade_new_task.clicked.connect(upgrade_task_admin)
-form_admin.tasks_list_all.itemClicked.connect(item_click_admin_one)
+form_admin.tableWidgetf.itemClicked.connect(item_click_admin_one)
 form_main.abmin_button.clicked.connect(admin_open)
-form_admin.tasks_list_all_2.itemClicked.connect(item_click_admin)
+form_admin.tableWidgetf_2.itemClicked.connect(item_click_admin)
 form_admin.task_old.clicked.connect(task_old_open_admin)
 form_admin.create_new_task.clicked.connect(create_new_task_admin)
-# form_task_old.filter_button.clicked.connect(filter_click_task_old)
-form_task_old.task_old_close.clicked.connect(task_old_close)
 form_main.task_old.clicked.connect(task_old_open)
-# form_main.filter_button.clicked.connect(filter_click)
 form_main.tasks_list_day.itemClicked.connect(item_click)
 form_main.main_calendar.selectionChanged.connect(date_click)
 # form_main.tasks_list.itemClicked.connect(item_click)
