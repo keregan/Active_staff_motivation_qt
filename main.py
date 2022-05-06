@@ -6,8 +6,8 @@ import tkinter
 from tkinter import *
 from PIL import Image
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication
-
+from PyQt5.QtWidgets import QApplication, QTableWidgetItem
+from PyQt5.uic.properties import QtCore
 
 Form_main, Window_main = uic.loadUiType("untitled_2.ui")
 Form_new_task, Window_new_task = uic.loadUiType("untitled_new_task.ui")
@@ -138,6 +138,7 @@ def main_form():
 
 def restarter():
     try:
+        form_main.tableWidgetf.clearContents()
         form_main.tasks_list.clear()
         user_db_task = sqlite3.connect("User_db.db")
         cursor_db_task = user_db_task.cursor()
@@ -156,22 +157,40 @@ def restarter():
         if none_login_task is None:
             form_main.user_data.setText("Войдите в аккаунт")
         else:
+            cursor_db_task.execute("SELECT count(*) FROM tasks_old WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            ball_progress = cursor_db_task.fetchone()
+            ball_progressing = str(ball_progress[0])
+
+            form_main.progressBar_raise.setMaximum(100)
+            form_main.progressBar_raise.setValue(int(ball_progressing))
+
+            cursor_db_task.execute("SELECT count(*) FROM tasks WHERE user_login = ?", [user_login])
+            user_db_task.commit()
+            c_all = cursor_db_task.fetchone()
+            form_main.tableWidgetf.setRowCount(int(c_all[0]))
+
+
             cursor_db_task.execute(
                 "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
                 "lead_time_one, id FROM tasks WHERE user_login = ?",
                 [user_login])
             user_db_task.commit()
             rec = cursor_db_task.fetchall()
-
+            j_ps = 0
             for row in rec:
                 ball_s = str(row[3])
-                new_str_task = "ID: {0:25.10}".format(str(row[6])) + " " + "{0:.15}".format(row[0]) + "{0:300}".format(" ") + "{0:30.15}".format(row[1])
-
-                # new_str_task = "ID: {0:.10} {1:.20} {2:.20} {3:.20}    Дата: ".format(str(row[6]), row[0], row[1], row[4]) + str(row[5])
-                form_main.tasks_list.addItem(str(new_str_task))
-            # year_task = int(s[0]) * 1000 + int(s[1]) * 100 + int(s[2]) * 10 + int(s[3])
-            # month_task = int(s[5]) * 10 + int(s[6])
-            # day_task = int(s[8]) * 10 + int(s[9])
+                str_row_6 = QTableWidgetItem(str(row[6]))
+                form_main.tableWidgetf.setItem(j_ps, 0, str_row_6)
+                str_row_0 = QTableWidgetItem(str(row[0]))
+                form_main.tableWidgetf.setItem(j_ps, 1, str_row_0)
+                str_row_1 = QTableWidgetItem(str(row[1]))
+                form_main.tableWidgetf.setItem(j_ps, 2, str_row_1)
+                str_row_2 = QTableWidgetItem(str(row[2]))
+                form_main.tableWidgetf.setItem(j_ps, 3, str_row_2)
+                str_row_5 = QTableWidgetItem(str(row[5]))
+                form_main.tableWidgetf.setItem(j_ps, 4, str_row_5)
+                j_ps = j_ps + 1
 
             main_form()
     except sqlite3.Error as err:
@@ -1351,6 +1370,52 @@ def restarter_admin():
         user_db_task.close()
 
 
+def item_click_table(item):
+    str_task = item.row()
+    id_task = form_main.tableWidgetf.item(str_task, 0).text()
+
+    form_main.number_task.setText(id_task)
+    user_login = form_main.user_login.text()
+    id_task = form_main.number_task.text()
+    try:
+        user_db_task = sqlite3.connect("User_db.db")
+        cursor_db_task = user_db_task.cursor()
+
+        cursor_db_task.execute("SELECT id FROM tasks WHERE user_login = ? AND id = ?", [user_login, id_task])
+        user_db_task.commit()
+        err_id = cursor_db_task.fetchone()
+
+        if err_id is None:
+            form_main.error_task.setText("Такого id задачи нету")
+        else:
+            cursor_db_task.execute(
+                "SELECT name_task_one, status_task_one, description_task_one, ball_one, group_task_one, "
+                "lead_time_one FROM tasks WHERE user_login = ? AND id= ?", [user_login, id_task])
+            user_db_task.commit()
+            rec = cursor_db_task.fetchall()
+            for row in rec:
+                form_main.name_task.setText(row[0])
+                form_main.status_task.setText(row[1])
+                form_main.description_task.setText(row[2])
+                form_main.ball_2.setText(str(row[3]))
+                form_main.group_task.setText(row[4])
+                s = str(row[5])
+
+            year_task = int(s[0]) * 1000 + int(s[1]) * 100 + int(s[2]) * 10 + int(s[3])
+            month_task = int(s[5]) * 10 + int(s[6])
+            day_task = int(s[8]) * 10 + int(s[9])
+
+            day = datetime.date(year_task, month_task, day_task)
+            form_main.date_task.setText(str(day))
+    except sqlite3.Error as err:
+        form_new_task.error_new_task.setText(err)
+    finally:
+        cursor_db_task.close()
+        user_db_task.close()
+
+
+form_main.tableWidgetf.itemClicked.connect(item_click_table)
+form_main.tableWidgetf.itemDoubleClicked.connect(restarter)
 form_admin.delete_task.clicked.connect(delete_task_admin)
 form_admin.upgrade_new_task.clicked.connect(upgrade_task_admin)
 form_admin.tasks_list_all.itemClicked.connect(item_click_admin_one)
@@ -1358,13 +1423,13 @@ form_main.abmin_button.clicked.connect(admin_open)
 form_admin.tasks_list_all_2.itemClicked.connect(item_click_admin)
 form_admin.task_old.clicked.connect(task_old_open_admin)
 form_admin.create_new_task.clicked.connect(create_new_task_admin)
-form_task_old.filter_button.clicked.connect(filter_click_task_old)
+# form_task_old.filter_button.clicked.connect(filter_click_task_old)
 form_task_old.task_old_close.clicked.connect(task_old_close)
 form_main.task_old.clicked.connect(task_old_open)
-form_main.filter_button.clicked.connect(filter_click)
+# form_main.filter_button.clicked.connect(filter_click)
 form_main.tasks_list_day.itemClicked.connect(item_click)
 form_main.main_calendar.selectionChanged.connect(date_click)
-form_main.tasks_list.itemClicked.connect(item_click)
+# form_main.tasks_list.itemClicked.connect(item_click)
 form_upgrade_task.upgrade_new_task.clicked.connect(upgrade_new_task)
 form_main.upgrade_task_window_2.clicked.connect(upgrade_task)
 form_main.delete_task_window.clicked.connect(delete_task)
