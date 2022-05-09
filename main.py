@@ -797,7 +797,7 @@ def admin_open():
             user_db_task.commit()
             position_admin = cursor_db_task.fetchone()
             position_admin_2 = str(position_admin[0])
-            print(position_admin_2)
+
             if position_admin_2 != "admin":
                 form_main.err_admin.setText("Нет доступа")
             else:
@@ -1222,7 +1222,6 @@ form_admin.create_new_task.clicked.connect(create_new_task_admin)
 form_main.task_old.clicked.connect(task_old_open)
 form_main.tasks_list_day.itemClicked.connect(item_click)
 form_main.main_calendar.selectionChanged.connect(date_click)
-# form_main.tasks_list.itemClicked.connect(item_click)
 form_upgrade_task.upgrade_new_task.clicked.connect(upgrade_new_task)
 form_main.upgrade_task_window_2.clicked.connect(upgrade_task)
 form_main.delete_task_window.clicked.connect(delete_task)
